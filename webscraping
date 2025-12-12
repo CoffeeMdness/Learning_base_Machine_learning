@@ -1,0 +1,39 @@
+# webscraping data 
+#used to find financials data
+!pip install yfinance
+#BeautiFulSoup important library for webscraping
+!pip install bs4
+#API HTML pour python 
+!pip install requests
+
+##### Les importations 
+import yfinance as yf
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+import warnings
+# Ignore toutes les alertes
+warnings.filterwarnings("ignore", category=FutureWarning)
+
+#on récupère l'URL
+URL = 'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/revenue.htm'
+#on créer une requête qui va nous chercher les informations de la page web. 
+response = requests.get(URL)
+#Pour le moment la réponse est un type d'objet non exploitable pour l'analyse, cad une requête. Nous allons la transformer en text pour la manipuler.
+html_data = response.text
+#L'outil BeautifulSoup va remixer l'ensemble du fichier text et lui restituer sa hierarchie HTML. 
+soup = BeautifulSoup(html_data, "html.parser")
+#Pour observer la disposition du fichier nous pouvons réaliser la commande : 
+print(soup.prettify())
+#Maintenant on cherhce la table à importer avec soit find_all(object = 'table') (qui retourne toutes les tables du document.
+#soit find / find_next pour chercher une table spécifique. exemple si dessous : 
+#
+heading = soup.find("h3", {"id": "Most_densely_populated_countries"})
+
+# Get the next table after this heading
+table = heading.find_next("table")
+
+# Convert to DataFrame
+df = pd.read_html(str(table))[0]
+print(df.head())
